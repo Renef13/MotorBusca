@@ -1,6 +1,5 @@
 from xml.dom.minidom import parse
 
-
 def search_titles(xml_file, search_term):
     dom = parse(xml_file)
 
@@ -19,8 +18,10 @@ def search_titles(xml_file, search_term):
 
 
 xml_file = 'verbetesWikipedia.xml'
-search_term = 'Zoo'
+search_term = 'computers'
 result = search_titles(xml_file, search_term)
 print(f"\nTítulos encontrados com '{search_term}':")
 for title in result:
     print(title)
+
+print(f'\n{len(result)} resultados encontrados para {search_term}')

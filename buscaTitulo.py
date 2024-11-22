@@ -42,3 +42,7 @@ if __name__ == "__main__":
             break
 
     print(f"\n{len(resultados)} resultados encontrados para '{search_term}'.")
+
+
+def mostrar(mensagem):
+    print(mensagem)

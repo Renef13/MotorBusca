@@ -1,38 +1,40 @@
 from xml.dom.minidom import parse
 import re
 
-def search_titles_and_count(xml_file, search_term):
-    dom = parse(xml_file)
 
-    search_term = search_term.lower()
+class XMLSearchProcessor:
+    def __init__(self, xml_file):
+        self.xml_file = xml_file
+        self.dom = parse(xml_file)
 
-    pattern = re.compile(rf'\b{re.escape(search_term)}\b')
+    def search_titles_and_count(self, search_term):
+        search_term = search_term.lower()
+        pattern = re.compile(rf'\b{re.escape(search_term)}\b')
 
-    pages = dom.getElementsByTagName('page')
-    matching_titles = {}
+        pages = self.dom.getElementsByTagName('page')
+        matching_titles = {}
 
-    for page in pages:
+        for page in pages:
+            title = page.getElementsByTagName('title')[0].firstChild.data
 
-        title = page.getElementsByTagName('title')[0].firstChild.data
+            text_elements = page.getElementsByTagName('text')
+            if text_elements and text_elements[0].firstChild:
+                text = text_elements[0].firstChild.data.lower()
 
+                count = len(pattern.findall(text))
 
-        text_elements = page.getElementsByTagName('text')
-        if text_elements and text_elements[0].firstChild:
-            text = text_elements[0].firstChild.data.lower()
+                if count > 0:
+                    matching_titles[title] = count
 
-            count = len(pattern.findall(text))
+        return dict(sorted(matching_titles.items(), key=lambda item: item[1], reverse=True))
 
-            if count > 0:
-                matching_titles[title] = count
-
-    return dict(sorted(matching_titles.items(), key=lambda item: item[1], reverse=True))
-
-
-if __name__ == "__main__":
+def main():
     xml_file = 'verbetesWikipedia.xml'
     search_term = 'computer'
 
-    resultados = search_titles_and_count(xml_file, search_term)
+    processor = XMLSearchProcessor(xml_file)
+
+    resultados = processor.search_titles_and_count(search_term)
 
     print(f"\nPáginas encontradas com a palavra '{search_term}' (apenas os 10 primeiros):\n")
     for i, (title, count) in enumerate(resultados.items()):
@@ -44,5 +46,5 @@ if __name__ == "__main__":
     print(f"\n{len(resultados)} resultados encontrados para '{search_term}'.")
 
 
-def dobrar(a):
-    return a*2
+if __name__ == "__main__":
+    main()

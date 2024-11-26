@@ -37,7 +37,7 @@ class XMLSearchProcessor:
         return dict(sorted(matching_titles.items(), key=lambda item: item[1][2], reverse=True))
 
 def main():
-    xml_file = '../../../Downloads/MotorBusca-master/MotorBusca-master/verbetesWikipedia.xml'
+    xml_file = 'verbetesWikipedia.xml'  
     processor = XMLSearchProcessor(xml_file)  
 
 

@@ -1,6 +1,6 @@
 from xml.dom.minidom import parse
 
-xml_file = 'verbetesWikipedia.xml'
+xml_file = '../../../Downloads/MotorBusca-master/MotorBusca-master/verbetesWikipedia.xml'
 dom = parse(xml_file)
 
 pages = dom.getElementsByTagName('page')

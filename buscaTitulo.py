@@ -17,33 +17,59 @@ class XMLSearchProcessor:
         for page in pages:
             title = page.getElementsByTagName('title')[0].firstChild.data
 
+            # Contando o número de palavras no texto
+            
+
+            
+
             text_elements = page.getElementsByTagName('text')
             if text_elements and text_elements[0].firstChild:
                 text = text_elements[0].firstChild.data.lower()
+                words = text.split()
+                total_words = len(words)
 
                 count = len(pattern.findall(text))
+                density = count / total_words
 
                 if count > 0:
-                    matching_titles[title] = count
+                    matching_titles[title] = (count, total_words,density)
 
-        return dict(sorted(matching_titles.items(), key=lambda item: item[1], reverse=True))
+        return dict(sorted(matching_titles.items(), key=lambda item: item[1][2], reverse=True))
 
 def main():
-    xml_file = 'verbetesWikipedia.xml'
-    search_term = 'computer'
+    xml_file = '../../../Downloads/MotorBusca-master/MotorBusca-master/verbetesWikipedia.xml'
+    processor = XMLSearchProcessor(xml_file)  
 
-    processor = XMLSearchProcessor(xml_file)
 
-    resultados = processor.search_titles_and_count(search_term)
+    # Dicionário para armazenar os resultados das pesquisas anteriores
+    cache = {} 
 
-    print(f"\nPáginas encontradas com a palavra '{search_term}' (apenas os 10 primeiros):\n")
-    for i, (title, count) in enumerate(resultados.items()):
-        if i < 10:
-            print(f"{i + 1}. Título: {title}, Ocorrências no texto: {count}")
+    while True:
+        search_term = input("Digite a palavra que deseja buscar (ou 'sair' para encerrar): ").strip()
+
+        if search_term.lower() == 'sair':
+            print("Saindo do programa...")
+            break  
+
+        # Verifica se o resultado já está em cache
+        if search_term in cache:
+            print(f"\nResultado encontrado no cache para '{search_term}':")
+            resultados = cache[search_term]  
         else:
-            break
+            resultados = processor.search_titles_and_count(search_term)
+            cache[search_term] = resultados  
 
-    print(f"\n{len(resultados)} resultados encontrados para '{search_term}'.")
+        
+        if resultados:
+            print(f"\nPáginas encontradas com a palavra '{search_term}' (apenas os 10 primeiros):\n")
+            for i, (title, count) in enumerate(resultados.items()):
+                if i < 10:
+                    print(f"{i + 1}. Título: {title}|   |Ocorrências no texto/Total de palavras/Densidade: {count}")
+                else:
+                    break
+            print(f"\n{len(resultados)} resultados encontrados para '{search_term}'.")
+        else:
+            print(f"\nNenhum resultado encontrado para '{search_term}'.")
 
 
 if __name__ == "__main__":

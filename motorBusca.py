@@ -41,6 +41,12 @@ def buscarTitulo(termo_buscado):
 
     return titulos_encontrados
 
+
+
+# TODO: implementacao da busca
+def busca():
+    pass
+
 resultados = buscarTitulo('computers')
 
 cont = 0

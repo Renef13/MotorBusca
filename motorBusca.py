@@ -72,12 +72,13 @@ def buscar(termo_buscado):
 
     return artigos_ordenados
 
+
 resultados = buscar('computers')
 
 cont = 0
 
 for artigo_id, (artigo_titulo, relevancia) in resultados[:5]:
-    print(f'Id: {artigo_id},Titulo: {artigo_titulo}, Relevancia: {(relevancia*10):.2f}\n')
-    print('-'*40)
+    print(f'Id: {artigo_id},Titulo: {artigo_titulo}, Relevancia: {(relevancia * 10):.2f}\n')
+    print('-' * 40)
     cont += 1
 print('Resultados encontrados: ', cont)

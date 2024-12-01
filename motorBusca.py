@@ -14,15 +14,14 @@ def abrirXML():
     return paginas_cache
 
 
-def buscaPalavraInteira(termo, texto):
-    # busca a palavra inteira ignorando especias
-    palavra = r'\b' + re.escape(termo) + r'\b'
-    return bool(re.search(palavra, texto, re.IGNORECASE))
-
-
 def filtrarPalavras(termo_buscado, texto):
     palavras = texto.split()
-    return [palavra for palavra in palavras if buscaPalavraInteira(termo_buscado, palavra)]
+
+    for palavra in palavras:
+        if termo_buscado.lower() == palavra.lower():
+            return True
+
+    return False
 
 
 def buscaPartePalavra(termo, texto):
@@ -41,8 +40,8 @@ def buscarTermo(termo_buscado):
         pagina_titulo = pagina.find('title').text
         pagina_texto = pagina.find('text').text
 
-        palavras_relevantes = filtrarPalavras(termo_buscado, pagina_texto)
-        if palavras_relevantes:  # tem palavra que eu quero
+        palavras_relevante = filtrarPalavras(termo_buscado, pagina_texto)
+        if palavras_relevante:  # tem palavra que eu quero
             if pagina_titulo not in artigos_encontrados:
                 artigos_encontrados[pagina_titulo] = (pagina.find('id').text, pagina.find('text').text)
 
@@ -51,23 +50,18 @@ def buscarTermo(termo_buscado):
 
 def relevancia(artigos, termo_buscado):
     artigos_classificados = {}
+    termo_buscado_regex = re.compile(r'\b' + re.escape(termo_buscado) + r'\b', re.IGNORECASE)
+
     for artigo_titulo, (artigo_id, artigo_texto) in artigos.items():
         relevancia = 0
-        num_palavras = 0
-        num_correspondecias = 0
-
-        for palavra in artigo_texto.split():
-            num_palavras += 1
-            if buscaPalavraInteira(termo_buscado, palavra):
-                num_correspondecias += 1
+        num_palavras = len(artigo_texto.split())
+        num_correspondecias = len(termo_buscado_regex.findall(artigo_texto))
 
         if num_palavras > 0:
             relevancia = num_correspondecias / num_palavras
 
-        for palavra_titulo in artigo_titulo:
-            if buscaPalavraInteira(termo_buscado, palavra_titulo):
-                relevancia += 0.1
-                break
+        if artigo_titulo.lower() in termo_buscado.lower():
+            relevancia += 0.1
         artigos_classificados[artigo_id] = (artigo_titulo, relevancia)
 
     return artigos_classificados
@@ -75,6 +69,7 @@ def relevancia(artigos, termo_buscado):
 
 def buscar(termo_buscado):
     termo_buscado = termo_buscado.lower()
+
     artigos_encontrados = buscarTermo(termo_buscado)
     artigos_classificados = relevancia(artigos_encontrados, termo_buscado)
 

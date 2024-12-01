@@ -1,6 +1,6 @@
-from lxml import etree as et
 import re
-from fuzzywuzzy import fuzz
+
+from lxml import etree as et
 
 paginas_cache = None
 
@@ -15,21 +15,8 @@ def abrirXML():
 
 
 def filtrarPalavras(termo_buscado, texto):
-    palavras = texto.split()
-
-    for palavra in palavras:
-        if termo_buscado.lower() == palavra.lower():
-            return True
-
-    return False
-
-
-def buscaPartePalavra(termo, texto):
-    # busca palavras 80% similares
-    SIMILARIDADE = 80
-    if fuzz.ratio(termo, texto) > SIMILARIDADE:
-        return True
-
+    padrao = rf'\b{re.escape(termo_buscado)}\b'
+    return bool(re.search(padrao, texto,re.IGNORECASE))
 
 def buscarTermo(termo_buscado):
     termo_buscado = termo_buscado.lower()
@@ -40,8 +27,7 @@ def buscarTermo(termo_buscado):
         pagina_titulo = pagina.find('title').text
         pagina_texto = pagina.find('text').text
 
-        palavras_relevante = filtrarPalavras(termo_buscado, pagina_texto)
-        if palavras_relevante:  # tem palavra que eu quero
+        if  filtrarPalavras(termo_buscado, pagina_texto):  # tem palavra que eu quero
             if pagina_titulo not in artigos_encontrados:
                 artigos_encontrados[pagina_titulo] = (pagina.find('id').text, pagina.find('text').text)
 
@@ -60,7 +46,8 @@ def relevancia(artigos, termo_buscado):
         if num_palavras > 0:
             relevancia = num_correspondecias / num_palavras
 
-        if artigo_titulo.lower() in termo_buscado.lower():
+        # print(f'artigo_titulo: {artigo_titulo} | termo_buscado: {termo_buscado}')
+        if termo_buscado_regex.search(artigo_titulo): # ordem errada ?
             relevancia += 0.1
         artigos_classificados[artigo_id] = (artigo_titulo, relevancia)
 

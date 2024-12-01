@@ -4,6 +4,7 @@ from fuzzywuzzy import fuzz
 
 paginas_cache = None
 
+
 def abrirXML():
     global paginas_cache
     if paginas_cache is None:
@@ -17,6 +18,11 @@ def buscaPalavraInteira(termo, texto):
     # busca a palavra inteira ignorando especias
     palavra = r'\b' + re.escape(termo) + r'\b'
     return bool(re.search(palavra, texto, re.IGNORECASE))
+
+
+def filtrarPalavras(termo_buscado, texto):
+    palavras = texto.split()
+    return [palavra for palavra in palavras if buscaPalavraInteira(termo_buscado, palavra)]
 
 
 def buscaPartePalavra(termo, texto):
@@ -34,11 +40,12 @@ def buscarTermo(termo_buscado):
     for pagina in paginas:
         pagina_titulo = pagina.find('title').text
         pagina_texto = pagina.find('text').text
-        for palavra in pagina_texto.split():
-            if buscaPalavraInteira(termo_buscado, palavra):  # or buscaPartePalavra(termo_buscado, palavra):
-                if pagina_titulo not in artigos_encontrados:
-                    artigos_encontrados[pagina_titulo] = (pagina.find('id').text, pagina.find('text').text)
-                    break
+
+        palavras_relevantes = filtrarPalavras(termo_buscado, pagina_texto)
+        if palavras_relevantes:  # tem palavra que eu quero
+            if pagina_titulo not in artigos_encontrados:
+                artigos_encontrados[pagina_titulo] = (pagina.find('id').text, pagina.find('text').text)
+
     return artigos_encontrados
 
 

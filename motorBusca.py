@@ -3,13 +3,6 @@ import re
 from fuzzywuzzy import fuzz
 
 
-# print(f'Num de páginas: {len(paginas)}')
-# for pagina in paginas:
-#     paginaId = pagina.find('id').text
-#     pagina_titulo = pagina.find('title').text
-#     print(f'Id: {paginaId}: Titulo: {pagina_titulo}\n')
-
-
 def abrirXML():
     arquivo = et.parse('verbetesWikipedia.xml')
     raiz = arquivo.getroot()
@@ -61,9 +54,10 @@ def relevancia(artigos, termo_buscado):
         if num_palavras > 0:
             relevancia = num_correspondecias / num_palavras
 
-        if buscaPalavraInteira(termo_buscado, artigo_titulo):
-            relevancia += 0.1
-
+        for palavra_titulo in artigo_titulo:
+            if buscaPalavraInteira(termo_buscado, palavra_titulo):
+                relevancia += 0.1
+                break
         artigos_classificados[artigo_id] = (artigo_titulo, relevancia)
 
     return artigos_classificados

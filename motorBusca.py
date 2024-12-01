@@ -2,12 +2,15 @@ from lxml import etree as et
 import re
 from fuzzywuzzy import fuzz
 
+paginas_cache = None
 
 def abrirXML():
-    arquivo = et.parse('verbetesWikipedia.xml')
-    raiz = arquivo.getroot()
-    paginas = raiz.xpath('//page')
-    return paginas
+    global paginas_cache
+    if paginas_cache is None:
+        arquivo = et.parse('verbetesWikipedia.xml')
+        raiz = arquivo.getroot()
+        paginas_cache = raiz.xpath('//page')
+    return paginas_cache
 
 
 def buscaPalavraInteira(termo, texto):

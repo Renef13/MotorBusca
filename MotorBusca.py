@@ -1,18 +1,7 @@
 import re
-from lxml import etree as et
 
-
-class XMLData:
-    def __init__(self, arquivo_xml):
-        self.paginas_armazenadas = None
-        self.arquivo_xml = arquivo_xml
-
-    def abrirXML(self):
-        if self.paginas_armazenadas is None:
-            arquivo = et.parse(self.arquivo_xml)
-            raiz = arquivo.getroot()
-            self.paginas_armazenadas= raiz.xpath('//page')
-        return self.paginas_armazenadas
+from CacheBusca import CacheBusca
+from GerenciadorXML import XMLData
 
 
 class MotorBusca:
@@ -50,31 +39,26 @@ class MotorBusca:
             if num_palavras > 0:
                 relevancia = num_correspondecias / num_palavras
 
-            if termo_buscado_regex.search(artigo_titulo): # relevancia aumentada
+            if termo_buscado_regex.search(artigo_titulo):  # relevancia aumentada
                 relevancia += 0.1
             artigos_classificados[artigo_id] = (artigo_titulo, relevancia)
 
         return artigos_classificados
 
+    def ordenarArtigos(self, artigos):
+        return sorted(artigos.items(), key=lambda x: x[1][1], reverse=True)
+
     def buscar(self, termo_buscado):
         termo_buscado = termo_buscado.lower()
+        cache = CacheBusca()
+
+        if cache.inCache(termo_buscado):
+            return self.ordenarArtigos(cache.get(termo_buscado))
 
         artigos_encontrados = self.buscarTermo(termo_buscado)
         artigos_classificados = self.relevancia(artigos_encontrados, termo_buscado)
+        artigos_ordenados = self.ordenarArtigos(artigos_classificados)
+        artigos_relevantes = dict(artigos_ordenados[:5])
+        cache.set(termo_buscado, artigos_relevantes)
 
-        artigos_ordenados = sorted(artigos_classificados.items(), key=lambda x: x[1][1], reverse=True)
-
-        return artigos_ordenados
-
-arquivo_xml = XMLData('verbetesWikipedia.xml')
-
-buscador = MotorBusca(arquivo_xml)
-resultados = buscador.buscar('computers')
-
-cont = 0
-
-for artigo_id, (artigo_titulo, relevancia) in resultados[:5]:
-    print(f'Id: {artigo_id},Titulo: {artigo_titulo}, Relevancia: {(relevancia * 10):.2f}\n')
-    print('-' * 40)
-    cont += 1
-print('Resultados encontrados: ', cont)
+        return artigos_relevantes

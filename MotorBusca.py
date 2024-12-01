@@ -1,12 +1,11 @@
 import re
-
 from CacheBusca import CacheBusca
-from GerenciadorXML import XMLData
 
 
 class MotorBusca:
     def __init__(self, paginas_armazenadas):
         self.paginas_armazenadas = paginas_armazenadas
+        self.cache = CacheBusca()
 
     def filtrarPalavras(self, termo_buscado, texto):
         padrao = rf'\b{re.escape(termo_buscado)}\b'
@@ -50,15 +49,14 @@ class MotorBusca:
 
     def buscar(self, termo_buscado):
         termo_buscado = termo_buscado.lower()
-        cache = CacheBusca()
 
-        if cache.inCache(termo_buscado):
-            return self.ordenarArtigos(cache.get(termo_buscado))
+        if self.cache.inCache(termo_buscado):
+            return dict(self.ordenarArtigos(self.cache.get(termo_buscado)))
 
         artigos_encontrados = self.buscarTermo(termo_buscado)
         artigos_classificados = self.relevancia(artigos_encontrados, termo_buscado)
         artigos_ordenados = self.ordenarArtigos(artigos_classificados)
         artigos_relevantes = dict(artigos_ordenados[:5])
-        cache.set(termo_buscado, artigos_relevantes)
+        self.cache.set(termo_buscado, artigos_relevantes)
 
         return artigos_relevantes

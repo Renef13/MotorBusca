@@ -1,70 +1,75 @@
 import re
 from lxml import etree as et
 
-paginas_cache = None
+
+class XMLData:
+    def __init__(self, arquivo_xml):
+        self.paginas_armazenadas = None
+        self.arquivo_xml = arquivo_xml
+
+    def abrirXML(self):
+        if self.paginas_armazenadas is None:
+            arquivo = et.parse(self.arquivo_xml)
+            raiz = arquivo.getroot()
+            self.paginas_armazenadas= raiz.xpath('//page')
+        return self.paginas_armazenadas
 
 
-def abrirXML():
-    global paginas_cache
-    if paginas_cache is None:
-        arquivo = et.parse('verbetesWikipedia.xml')
-        raiz = arquivo.getroot()
-        paginas_cache = raiz.xpath('//page')
-    return paginas_cache
+class MotorBusca:
+    def __init__(self, paginas_armazenadas):
+        self.paginas_armazenadas = paginas_armazenadas
 
+    def filtrarPalavras(self, termo_buscado, texto):
+        padrao = rf'\b{re.escape(termo_buscado)}\b'
+        return bool(re.search(padrao, texto, re.IGNORECASE))
 
-def filtrarPalavras(termo_buscado, texto):
-    padrao = rf'\b{re.escape(termo_buscado)}\b'
-    return bool(re.search(padrao, texto, re.IGNORECASE))
+    def buscarTermo(self, termo_buscado):
+        termo_buscado = termo_buscado.lower()
+        paginas = self.paginas_armazenadas.abrirXML()
+        artigos_encontrados = {}
 
+        for pagina in paginas:
+            pagina_titulo = pagina.find('title').text
+            pagina_texto = pagina.find('text').text
 
-def buscarTermo(termo_buscado):
-    termo_buscado = termo_buscado.lower()
-    paginas = abrirXML()
-    artigos_encontrados = {}
+            if self.filtrarPalavras(termo_buscado, pagina_texto):  # tem palavra que eu quero
+                if pagina_titulo not in artigos_encontrados:
+                    artigos_encontrados[pagina_titulo] = (pagina.find('id').text, pagina.find('text').text)
 
-    for pagina in paginas:
-        pagina_titulo = pagina.find('title').text
-        pagina_texto = pagina.find('text').text
+        return artigos_encontrados
 
-        if filtrarPalavras(termo_buscado, pagina_texto):  # tem palavra que eu quero
-            if pagina_titulo not in artigos_encontrados:
-                artigos_encontrados[pagina_titulo] = (pagina.find('id').text, pagina.find('text').text)
+    def relevancia(self, artigos, termo_buscado):
+        artigos_classificados = {}
+        termo_buscado_regex = re.compile(r'\b' + re.escape(termo_buscado) + r'\b', re.IGNORECASE)
 
-    return artigos_encontrados
+        for artigo_titulo, (artigo_id, artigo_texto) in artigos.items():
+            relevancia = 0
+            num_palavras = len(artigo_texto.split())
+            num_correspondecias = len(termo_buscado_regex.findall(artigo_texto))
 
+            if num_palavras > 0:
+                relevancia = num_correspondecias / num_palavras
 
-def relevancia(artigos, termo_buscado):
-    artigos_classificados = {}
-    termo_buscado_regex = re.compile(r'\b' + re.escape(termo_buscado) + r'\b', re.IGNORECASE)
+            if termo_buscado_regex.search(artigo_titulo): # relevancia aumentada
+                relevancia += 0.1
+            artigos_classificados[artigo_id] = (artigo_titulo, relevancia)
 
-    for artigo_titulo, (artigo_id, artigo_texto) in artigos.items():
-        relevancia = 0
-        num_palavras = len(artigo_texto.split())
-        num_correspondecias = len(termo_buscado_regex.findall(artigo_texto))
+        return artigos_classificados
 
-        if num_palavras > 0:
-            relevancia = num_correspondecias / num_palavras
+    def buscar(self, termo_buscado):
+        termo_buscado = termo_buscado.lower()
 
-        if termo_buscado_regex.search(artigo_titulo):
-            relevancia += 0.1
-        artigos_classificados[artigo_id] = (artigo_titulo, relevancia)
+        artigos_encontrados = self.buscarTermo(termo_buscado)
+        artigos_classificados = self.relevancia(artigos_encontrados, termo_buscado)
 
-    return artigos_classificados
+        artigos_ordenados = sorted(artigos_classificados.items(), key=lambda x: x[1][1], reverse=True)
 
+        return artigos_ordenados
 
-def buscar(termo_buscado):
-    termo_buscado = termo_buscado.lower()
+arquivo_xml = XMLData('verbetesWikipedia.xml')
 
-    artigos_encontrados = buscarTermo(termo_buscado)
-    artigos_classificados = relevancia(artigos_encontrados, termo_buscado)
-
-    artigos_ordenados = sorted(artigos_classificados.items(), key=lambda x: x[1][1], reverse=True)
-
-    return artigos_ordenados
-
-
-resultados = buscar('computers')
+buscador = MotorBusca(arquivo_xml)
+resultados = buscador.buscar('computers')
 
 cont = 0
 

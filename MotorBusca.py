@@ -12,7 +12,7 @@ class MotorBusca:
         return bool(re.search(padrao, texto, re.IGNORECASE))
 
     def buscarTermo(self, termo_buscado):
-        termo_buscado = termo_buscado.lower()
+        termo_buscado = termo_buscado #.lower()
         paginas = self.paginas_armazenadas.abrirXML()
         artigos_encontrados = {}
 
@@ -42,21 +42,21 @@ class MotorBusca:
                 relevancia += 0.1
             artigos_classificados[artigo_id] = (artigo_titulo, relevancia)
 
-        return artigos_classificados
+        return sorted(artigos_classificados.items(), key=lambda x: x[1][1], reverse=True)
 
-    def ordenarArtigos(self, artigos):
-        return sorted(artigos.items(), key=lambda x: x[1][1], reverse=True)
+    # def ordenarArtigos(self, artigos):
+    #     return sorted(artigos.items(), key=lambda x: x[1][1], reverse=True)
 
     def buscar(self, termo_buscado):
         termo_buscado = termo_buscado.lower()
 
         if self.cache.inCache(termo_buscado):
-            return dict(self.ordenarArtigos(self.cache.get(termo_buscado)))
+            return dict(self.cache.get(termo_buscado))
 
         artigos_encontrados = self.buscarTermo(termo_buscado)
         artigos_classificados = self.relevancia(artigos_encontrados, termo_buscado)
-        artigos_ordenados = self.ordenarArtigos(artigos_classificados)
-        artigos_relevantes = dict(artigos_ordenados[:5])
+        #artigos_ordenados = self.ordenarArtigos(artigos_classificados)
+        artigos_relevantes = dict(artigos_classificados[:5])
         self.cache.set(termo_buscado, artigos_relevantes)
 
         return artigos_relevantes

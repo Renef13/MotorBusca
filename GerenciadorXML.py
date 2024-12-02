@@ -10,3 +10,4 @@ class XMLData:
             raiz = arquivo.getroot()
             self.paginas_armazenadas= raiz.xpath('//page')
         return self.paginas_armazenadas
+

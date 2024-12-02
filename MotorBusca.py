@@ -1,11 +1,19 @@
 import re
 from CacheBusca import CacheBusca
+import nltk
+nltk.download('stopwords')
+from nltk.corpus import stopwords
 
 
 class MotorBusca:
     def __init__(self, paginas_armazenadas):
         self.paginas_armazenadas = paginas_armazenadas
         self.cache = CacheBusca()
+        self.sw = stopwords.words('english')
+
+    def ehStopword(self,palavra):
+        if palavra in self.sw:
+            return True
 
     def filtrarPalavras(self, termo_buscado, texto):
         padrao = rf'\b{re.escape(termo_buscado)}\b'
@@ -50,6 +58,8 @@ class MotorBusca:
     def buscar(self, termo_buscado):
         termo_buscado = termo_buscado.lower()
 
+        if self.ehStopword(termo_buscado):
+            return None
         if self.cache.inCache(termo_buscado):
             return dict(self.cache.get(termo_buscado))
 
@@ -60,3 +70,22 @@ class MotorBusca:
         self.cache.set(termo_buscado, artigos_relevantes)
 
         return artigos_relevantes
+
+
+
+# def buscaPalavraInteira(termo, texto):
+#     # busca a palavra inteira ignorando especias
+#     palavra = r'\b' + re.escape(termo) + r'\b'
+#     return bool(re.search(palavra, texto, re.IGNORECASE))
+#
+#
+# def filtrarPalavras(termo_buscado, texto):
+#     palavras = texto.split()
+#     return [palavra for palavra in palavras if buscaPalavraInteira(termo_buscado, palavra)]
+#
+#
+# def buscaPartePalavra(termo, texto):
+#     # busca palavras 80% similares
+#     SIMILARIDADE = 80
+#     if fuzz.ratio(termo, texto) > SIMILARIDADE:
+#         return True

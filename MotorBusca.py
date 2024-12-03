@@ -1,7 +1,7 @@
 import re
 from CacheBusca import CacheBusca
-import nltk
-nltk.download('stopwords')
+#import nltk
+#nltk.download('stopwords')
 from nltk.corpus import stopwords
 
 

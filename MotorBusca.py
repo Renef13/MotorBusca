@@ -3,13 +3,15 @@ from CacheBusca import CacheBusca
 #import nltk
 #nltk.download('stopwords')
 from nltk.corpus import stopwords
-
+from lxml import etree as et
 
 class MotorBusca:
-    def __init__(self, paginas_armazenadas):
-        self.paginas_armazenadas = paginas_armazenadas
+    def __init__(self, arquivo_xml):
         self.cache = CacheBusca()
         self.sw = stopwords.words('english')
+        arquivo = et.parse(arquivo_xml)
+        raiz = arquivo.getroot()
+        self.paginas_armazenadas = raiz.xpath('//page')
 
     def ehStopword(self,palavra):
         if palavra in self.sw:
@@ -21,7 +23,7 @@ class MotorBusca:
 
     def buscarTermo(self, termo_buscado):
         termo_buscado = termo_buscado #.lower()
-        paginas = self.paginas_armazenadas.abrirXML()
+        paginas = self.paginas_armazenadas
         artigos_encontrados = {}
 
         for pagina in paginas:

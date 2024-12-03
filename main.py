@@ -1,9 +1,8 @@
-from GerenciadorXML import XMLData
 from MotorBusca import MotorBusca
 
 
 def main():
-    arquivo_xml = XMLData('verbetesWikipedia.xml')
+    arquivo_xml = 'verbetesWikipedia.xml'
     buscador = MotorBusca(arquivo_xml)
     while True:
         termo_buscado = input('Digite o termo buscado: ')

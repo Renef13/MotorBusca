@@ -35,6 +35,7 @@ class MotorBusca:
                 if pagina_titulo not in artigos_encontrados:
                     artigos_encontrados[pagina_titulo] = (pagina.find('id').text, pagina.find('text').text)
 
+        artigos_encontrados = self.relevancia(artigos_encontrados, termo_buscado)
         return artigos_encontrados
 
     def relevancia(self, artigos, termo_buscado):
@@ -67,24 +68,14 @@ class MotorBusca:
             return dict(self.cache.get(termo_buscado))
 
         artigos_encontrados = self.buscarTermo(termo_buscado)
-        artigos_classificados = self.relevancia(artigos_encontrados, termo_buscado)
+        #artigos_classificados = self.relevancia(artigos_encontrados, termo_buscado)
         # artigos_ordenados = self.ordenarArtigos(artigos_classificados)
-        artigos_relevantes = dict(artigos_classificados[:5])
+        artigos_relevantes = dict(artigos_encontrados[:5])
         self.cache.set(termo_buscado, artigos_relevantes)
 
         return artigos_relevantes
 
-# def buscaPalavraInteira(termo, texto):
-#     # busca a palavra inteira ignorando especias
-#     palavra = r'\b' + re.escape(termo) + r'\b'
-#     return bool(re.search(palavra, texto, re.IGNORECASE))
-#
-#
-# def filtrarPalavras(termo_buscado, texto):
-#     palavras = texto.split()
-#     return [palavra for palavra in palavras if buscaPalavraInteira(termo_buscado, palavra)]
-#
-#
+
 # def buscaPartePalavra(termo, texto):
 #     # busca palavras 80% similares
 #     SIMILARIDADE = 80

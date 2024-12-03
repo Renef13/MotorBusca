@@ -1,19 +1,20 @@
 import re
 from CacheBusca import CacheBusca
-#import nltk
-#nltk.download('stopwords')
+# import nltk
+# nltk.download('stopwords')
 from nltk.corpus import stopwords
 from lxml import etree as et
 
+
 class MotorBusca:
     def __init__(self, arquivo_xml):
-        self.cache = CacheBusca()
-        self.sw = stopwords.words('english')
         arquivo = et.parse(arquivo_xml)
         raiz = arquivo.getroot()
         self.paginas_armazenadas = raiz.xpath('//page')
+        self.cache = CacheBusca()
+        self.sw = stopwords.words('english')
 
-    def ehStopword(self,palavra):
+    def ehStopword(self, palavra):
         if palavra in self.sw:
             return True
 
@@ -22,7 +23,7 @@ class MotorBusca:
         return bool(re.search(padrao, texto, re.IGNORECASE))
 
     def buscarTermo(self, termo_buscado):
-        termo_buscado = termo_buscado #.lower()
+        termo_buscado = termo_buscado  # .lower()
         paginas = self.paginas_armazenadas
         artigos_encontrados = {}
 
@@ -67,13 +68,11 @@ class MotorBusca:
 
         artigos_encontrados = self.buscarTermo(termo_buscado)
         artigos_classificados = self.relevancia(artigos_encontrados, termo_buscado)
-        #artigos_ordenados = self.ordenarArtigos(artigos_classificados)
+        # artigos_ordenados = self.ordenarArtigos(artigos_classificados)
         artigos_relevantes = dict(artigos_classificados[:5])
         self.cache.set(termo_buscado, artigos_relevantes)
 
         return artigos_relevantes
-
-
 
 # def buscaPalavraInteira(termo, texto):
 #     # busca a palavra inteira ignorando especias

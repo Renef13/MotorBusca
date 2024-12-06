@@ -85,10 +85,10 @@ class MotorBusca:
         for pagina in paginas:
             pagina_texto = pagina.find('text').text
             for palavra in pagina_texto.split():
-                self.buscar(palavra)
-                if not self.eh_stop_word(palavra):
-                    self.palavras_buscadas.add(palavra)
-
+                if palavra not in self.palavras_buscadas:
+                    self.buscar(palavra)
+                    if not self.eh_stop_word(palavra):
+                        self.palavras_buscadas.add(palavra)
             i += 1
             print(f"Busca {i} realizada\n")
 

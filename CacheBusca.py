@@ -9,7 +9,7 @@ class CacheBusca:
         if termo_buscado not in self.cache:
             self.cache[termo_buscado] = resultados
 
-    def inCache(self, termo_buscado):
+    def in_cache(self, termo_buscado):
         if termo_buscado in self.cache:
             return True
         return False

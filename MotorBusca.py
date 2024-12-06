@@ -13,6 +13,8 @@ class MotorBusca:
         self.paginas_armazenadas = raiz.xpath('//page')
         self.cache = CacheBusca()
         self.sw = stopwords.words('english')
+        self.palavras_buscadas = set()
+        MotorBusca.pre_processar(self)
 
     def eh_stop_word(self, palavra):
         if palavra in self.sw:
@@ -24,7 +26,6 @@ class MotorBusca:
         return bool(re.search(padrao, texto, re.IGNORECASE))
 
     def buscar_termo(self, termo_buscado):
-        termo_buscado = termo_buscado  # .lower()
         paginas = self.paginas_armazenadas
         artigos_encontrados = {}
 
@@ -70,13 +71,26 @@ class MotorBusca:
             return dict(self.cache.get(termo_buscado))
 
         artigos_encontrados = self.buscar_termo(termo_buscado)
-        #artigos_classificados = self.relevancia(artigos_encontrados, termo_buscado)
+        # artigos_classificados = self.relevancia(artigos_encontrados, termo_buscado)
         # artigos_ordenados = self.ordenarArtigos(artigos_classificados)
         artigos_relevantes = dict(artigos_encontrados[:5])
         self.cache.set(termo_buscado, artigos_relevantes)
 
         return artigos_relevantes
 
+    @staticmethod
+    def pre_processar(self):
+        paginas = self.paginas_armazenadas
+        i = 0
+        for pagina in paginas:
+            pagina_texto = pagina.find('text').text
+            for palavra in pagina_texto.split():
+                self.buscar(palavra)
+                if not self.eh_stop_word(palavra):
+                    self.palavras_buscadas.add(palavra)
+
+            i += 1
+            print(f"Busca {i} realizada\n")
 
 # def buscaPartePalavra(termo, texto):
 #     # busca palavras 80% similares

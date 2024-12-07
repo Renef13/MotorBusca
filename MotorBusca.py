@@ -1,4 +1,6 @@
 import re
+import time
+
 from CacheBusca import CacheBusca
 # import nltk
 # nltk.download('stopwords')
@@ -61,11 +63,14 @@ class MotorBusca:
     #     return sorted(artigos.items(), key=lambda x: x[1][1], reverse=True)
 
     def buscar(self, termo_buscado):
+        start_time = time.time()
         termo_buscado = termo_buscado.lower()
 
         if self.eh_stop_word(termo_buscado):
             return None
         if self.cache.in_cache(termo_buscado):
+            end_time = time.time()
+            print(f"Busca realizada em {end_time - start_time:.4f} segundos\n")
             return dict(self.cache.get(termo_buscado))
 
         artigos_encontrados = self.buscar_termo(termo_buscado)
@@ -73,7 +78,8 @@ class MotorBusca:
         # artigos_ordenados = self.ordenarArtigos(artigos_classificados)
         artigos_relevantes = dict(artigos_encontrados[:5])
         self.cache.set(termo_buscado, artigos_relevantes)
-
+        end_time = time.time()
+        print(f"\nBusca realizada em {end_time - start_time:.2f} segundos\n")
         return artigos_relevantes
 
 # def buscaPartePalavra(termo, texto):

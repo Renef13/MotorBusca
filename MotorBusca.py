@@ -17,8 +17,7 @@ class MotorBusca:
         self.sw = stopwords.words('english')
 
     def eh_stop_word(self, palavra):
-        if palavra in self.sw:
-            return True
+        return palavra in self.sw
 
     @staticmethod
     def filtrar_palavras(termo_buscado, texto):

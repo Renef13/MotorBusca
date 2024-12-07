@@ -7,8 +7,8 @@ def main():
     while True:
         termo_buscado = input('Digite o termo buscado: ')
         resultados = buscador.buscar(termo_buscado)
-        if resultados is None:
-            print("Palavra curta demais\n")
+        if resultados is None or not resultados:
+            print("\033[31mSem resultados para essa busca\033[0m\n")
         else:
             for artigo_id, (artigo_titulo, relevancia) in resultados.items():
                 print(f'Id: {artigo_id},Titulo: {artigo_titulo}, Relevancia: {(relevancia * 10):.2f}\n')

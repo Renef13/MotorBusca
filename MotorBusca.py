@@ -14,7 +14,7 @@ class MotorBusca:
         self.cache = CacheBusca()
         self.sw = stopwords.words('english')
         self.palavras_buscadas = set()
-        MotorBusca.pre_processar(self)
+        self.pre_processar(self)
 
     def eh_stop_word(self, palavra):
         if palavra in self.sw:

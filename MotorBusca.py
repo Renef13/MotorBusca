@@ -4,7 +4,7 @@ from CacheBusca import CacheBusca
 # nltk.download('stopwords')
 from nltk.corpus import stopwords
 from lxml import etree as et
-
+import time
 
 class MotorBusca:
     def __init__(self, arquivo_xml):
@@ -80,6 +80,7 @@ class MotorBusca:
 
     @staticmethod
     def pre_processar(self):
+        start_time = time.time()
         paginas = self.paginas_armazenadas
         i = 0
         for pagina in paginas:
@@ -91,6 +92,8 @@ class MotorBusca:
                         self.palavras_buscadas.add(palavra)
             i += 1
             print(f"Busca {i} realizada\n")
+        end_time = time.time()  # Fim da medição
+        print(f"Tempo de execução do método 'buscar': {end_time - start_time:.4f} segundos")
 
 # def buscaPartePalavra(termo, texto):
 #     # busca palavras 80% similares

@@ -53,7 +53,7 @@ class MotorBusca:
             self.dicionario_global[pagina_id] = self.calcular_relevancia(pagina_texto)
 
         end_time = time.time()
-        print(f"Pré-processamento concluído em {end_time - start_time:.4f} segundos.")
+        print(f"Pre-processamento concluido em {end_time - start_time:.4f} segundos\n")
 
     def buscar(self, termo_buscado):
         termo_buscado = termo_buscado.lower()

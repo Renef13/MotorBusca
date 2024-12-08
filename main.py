@@ -6,16 +6,22 @@ def main():
     buscador = MotorBusca(arquivo_xml)
     while True:
         termo_buscado = input('Digite o termo buscado: ')
-        resultados = buscador.buscar(termo_buscado)
-        if resultados is None:
-            print("Palavra curta demais\n")
-        else:
-            for artigo_id, (artigo_titulo, relevancia) in resultados.items():
-                print(f'Id: {artigo_id},Titulo: {artigo_titulo}, Relevancia: {(relevancia * 10):.2f}\n')
-                print('-' * 40)
-        sair = input('\nDeseja continuar [S/N]?  ')
+        if len(termo_buscado.strip()) < 2:
+            print("\033[31mPalavra curta demaisa\033[0m\n")
+            continue
 
-        if sair.lower() == 'n':
+        resultados = buscador.buscar(termo_buscado)
+        if not resultados:
+            print("\033[31mNenhum resultado encontrado para o termo\033[0m\n")
+        else:
+            print(f"\nResultados para '{termo_buscado}':\n")
+            for artigo_titulo, relevancia in resultados.items():
+                print(f'Título: {artigo_titulo}')
+                print(f'Relevância: {(relevancia * 10):.2f}')
+                print('-' * 40)
+
+        sair = input('\nDeseja continuar [S/N]? ').strip().lower()
+        if sair == 'n':
             print('\nSaindo...')
             break
 

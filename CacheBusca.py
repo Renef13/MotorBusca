@@ -10,6 +10,4 @@ class CacheBusca:
             self.cache[termo_buscado] = resultados
 
     def in_cache(self, termo_buscado):
-        if termo_buscado in self.cache:
-            return True
-        return False
+        return termo_buscado in self.cache

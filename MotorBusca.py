@@ -1,5 +1,5 @@
 import re
-# from CacheBusca import CacheBusca
+from CacheBusca import CacheBusca
 from nltk.corpus import stopwords
 from lxml import etree as et
 import time
@@ -11,7 +11,7 @@ class MotorBusca:
         arquivo = et.parse(arquivo_xml)
         raiz = arquivo.getroot()
         self.paginas_armazenadas = raiz.xpath('//page')
-        # self.cache = CacheBusca()
+        self.cache = CacheBusca()
         self.sw = stopwords.words('english')
         self.dicionario_global = {}
         self.pre_processar()
@@ -60,11 +60,11 @@ class MotorBusca:
 
         if self.eh_stop_word(termo_buscado):
             return None
-
-        # if self.cache.in_cache(termo_buscado):
-        #     return self.cache.get(termo_buscado)
-
         start_time = time.time()
+        if self.cache.in_cache(termo_buscado):
+            end_time = time.time()
+            print(f"Tempo de busca para '{termo_buscado}': {end_time - start_time:.4f} segundos.")
+            return self.cache.get(termo_buscado)
 
         relevancia_paginas = {}
 
@@ -91,5 +91,5 @@ class MotorBusca:
         for pagina_id, (titulo, relevancia) in paginas_mais_relevantes:
             resultado[titulo] = relevancia
 
-        # self.cache.set(termo_buscado, resultado)
+        self.cache.set(termo_buscado, resultado)
         return resultado

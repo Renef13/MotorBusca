@@ -104,7 +104,7 @@ class MotorBusca:
         for pagina_id, relevancia in paginas_mais_relevantes:
             pagina_titulo = next(
                 (pagina.find('title').text for pagina in self.paginas_armazenadas if pagina.find('id').text == pagina_id),
-                "Título desconhecido"
+                "Titulo desconhecido"
             )
             resultado[pagina_titulo] = relevancia
 

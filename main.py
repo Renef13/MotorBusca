@@ -5,10 +5,10 @@ def main():
     buscador = MotorBusca(arquivo_xml)
 
     while True:
-        termos_buscados = input('Digite os termos buscados (separados por espaço): ')
+        termos_buscados = input('Digite os termos buscados: ')
         
         if len(termos_buscados.strip()) < 2:
-            print("\033[31mEntrada muito curta. Digite pelo menos um termo válido.\033[0m\n")
+            print("\033[31mEntrada muito curta. Digite pelo menos um termo valido.\033[0m\n")
             continue
 
         resultados = buscador.buscar(termos_buscados)
@@ -18,8 +18,8 @@ def main():
         else:
             print(f"\nResultados para '{termos_buscados}':\n")
             for artigo_titulo, relevancia in resultados.items():
-                print(f'Título: {artigo_titulo}')
-                print(f'Relevância: {(relevancia * 10):.2f}')
+                print(f'Titulo: {artigo_titulo}')
+                print(f'Relevancia: {(relevancia * 10):.2f}')
                 print('-' * 40)
 
         sair = input('\nDeseja continuar [S/N]? ').strip().lower()
